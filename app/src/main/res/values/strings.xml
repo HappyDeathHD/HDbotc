@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">HDbotc</string>
+    <string name="inputJson">Поле для ввода скрипта JSON</string>
+    <string name="pickFile">Выбрать файл</string>
+    <string name="generate">Сгенерировать</string>
+    <string name="previewImage">Предпросмотр изображения</string>
+    <string name="save">Сохранить</string>
+</resources>
