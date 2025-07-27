@@ -44,10 +44,10 @@ public class TransparentTwoRow {
                 throw new JSONException("Meta data not found in the script.");
             }
 
-            String scriptName = metaData.optString("name", "Unknown Script");
-            String author = metaData.optString("author", "Unknown Author");
-            String title = scriptName + " by " + author;
-            canvas.drawText(title, 100, 100, paint);
+//            String scriptName = metaData.optString("name", "Unknown Script");
+//            String author = metaData.optString("author", "Unknown Author");
+//            String title = scriptName + " by " + author;
+//            canvas.drawText(title, 100, 100, paint);
 
             JSONArray charactersData = readRolesFromAssets(context);
 
@@ -71,7 +71,7 @@ public class TransparentTwoRow {
             }
 
             // Координаты для размещения блоков
-            int currentY = 200;
+            int currentY = 100;
             String[] teamNames = {"townsfolk", "outsider", "minion", "demon", "fabled"};
             String[] teamNamesRu = {"горожане", "изгои", "приспешники", "демоны", "мифы"};
 
