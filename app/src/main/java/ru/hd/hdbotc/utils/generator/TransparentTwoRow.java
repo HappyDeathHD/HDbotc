@@ -43,6 +43,21 @@ public class TransparentTwoRow {
             if (metaData == null) {
                 throw new JSONException("Meta data not found in the script.");
             }
+            
+            // Проверяем, является ли первый элемент метаданными (содержит поля name и author)
+            boolean isMetaData = metaData.has("name") && metaData.has("author");
+            
+            // Если первый элемент не метаданные, ищем метаданные в массиве
+            if (!isMetaData) {
+                for (int i = 0; i < script.length(); i++) {
+                    JSONObject obj = script.optJSONObject(i);
+                    if (obj != null && obj.has("name") && obj.has("author")) {
+                        metaData = obj;
+                        isMetaData = true;
+                        break;
+                    }
+                }
+            }
 
 //            String scriptName = metaData.optString("name", "Unknown Script");
 //            String author = metaData.optString("author", "Unknown Author");
@@ -59,8 +74,28 @@ public class TransparentTwoRow {
             teams.put("demon", new ArrayList<>());
             teams.put("fabled", new ArrayList<>());
 
-            for (int i = 1; i < script.length(); i++) { // Начинаем с индекса 1 (пропускаем метаданные)
-                String characterId = script.optString(i);
+            // Определяем начальный индекс для обработки персонажей
+            int startIndex = 0; // Начинаем с 0, пропуская только метаданные при обработке
+            
+            for (int i = startIndex; i < script.length(); i++) {
+                String characterId;
+                
+                // Проверяем формат элемента
+                if (script.optJSONObject(i) != null) {
+                    // Новый формат: объект с полем id
+                    JSONObject characterObj = script.getJSONObject(i);
+                    
+                    // Пропускаем метаданные (объекты с полями name и author)
+                    if (characterObj.has("name") && characterObj.has("author")) {
+                        continue;
+                    }
+                    
+                    characterId = characterObj.getString("id");
+                } else {
+                    // Старый формат: строка с ID
+                    characterId = script.getString(i);
+                }
+                
                 JSONObject character = findCharacterById(characterId, charactersData);
                 if (character != null) {
                     String team = character.optString("team", "unknown");
