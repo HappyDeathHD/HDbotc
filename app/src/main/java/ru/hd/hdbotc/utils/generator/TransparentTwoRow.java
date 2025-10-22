@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class TransparentTwoRow {
 
-    public Bitmap generateImageFromJson(Context context, JSONArray script, Typeface typefaceR, Typeface typefaceB) {
+    public Bitmap generateImageFromJson(Context context, JSONArray script, Typeface typefaceR, Typeface typefaceB, boolean addTitle) {
         try {
             // Размеры страницы А4 (300 DPI)
             int pageWidth = 2480; // Ширина страницы А4
@@ -43,10 +43,10 @@ public class TransparentTwoRow {
             if (metaData == null) {
                 throw new JSONException("Meta data not found in the script.");
             }
-            
+
             // Проверяем, является ли первый элемент метаданными (содержит поля name и author)
             boolean isMetaData = metaData.has("name") && metaData.has("author");
-            
+
             // Если первый элемент не метаданные, ищем метаданные в массиве
             if (!isMetaData) {
                 for (int i = 0; i < script.length(); i++) {
@@ -59,11 +59,16 @@ public class TransparentTwoRow {
                 }
             }
 
-//            String scriptName = metaData.optString("name", "Unknown Script");
-//            String author = metaData.optString("author", "Unknown Author");
-//            String title = scriptName + " by " + author;
-//            canvas.drawText(title, 100, 100, paint);
+            // Координаты для размещения блоков
+            int currentY = 100;
 
+            if (addTitle) {
+                String scriptName = metaData.optString("name", "Unknown Script");
+                String author = metaData.optString("author", "Unknown Author");
+                String title = scriptName + " by " + author;
+                canvas.drawText(title, 100, currentY, paint);
+                currentY += 50;
+            }
             JSONArray charactersData = readRolesFromAssets(context);
 
             // Разделяем роли по командам
@@ -76,26 +81,26 @@ public class TransparentTwoRow {
 
             // Определяем начальный индекс для обработки персонажей
             int startIndex = 0; // Начинаем с 0, пропуская только метаданные при обработке
-            
+
             for (int i = startIndex; i < script.length(); i++) {
                 String characterId;
-                
+
                 // Проверяем формат элемента
                 if (script.optJSONObject(i) != null) {
                     // Новый формат: объект с полем id
                     JSONObject characterObj = script.getJSONObject(i);
-                    
+
                     // Пропускаем метаданные (объекты с полями name и author)
                     if (characterObj.has("name") && characterObj.has("author")) {
                         continue;
                     }
-                    
+
                     characterId = characterObj.getString("id");
                 } else {
                     // Старый формат: строка с ID
                     characterId = script.getString(i);
                 }
-                
+
                 JSONObject character = findCharacterById(characterId, charactersData);
                 if (character != null) {
                     String team = character.optString("team", "unknown");
@@ -105,8 +110,6 @@ public class TransparentTwoRow {
                 }
             }
 
-            // Координаты для размещения блоков
-            int currentY = 100;
             String[] teamNames = {"townsfolk", "outsider", "minion", "demon", "fabled"};
             String[] teamNamesRu = {"горожане", "изгои", "приспешники", "демоны", "мифы"};
 

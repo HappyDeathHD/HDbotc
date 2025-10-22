@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONArray;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton generateButton;
     private ImageView previewImage;
     private Spinner scriptStyleSpinner;
+    private MaterialCheckBox addTitleCheckBox;
 
     private final ActivityResultLauncher<Intent> filePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         generateButton = findViewById(R.id.generateButton);
         previewImage = findViewById(R.id.previewImage);
         scriptStyleSpinner = findViewById(R.id.scriptStyleSpinner);
+        addTitleCheckBox = findViewById(R.id.addTitleCheckBox);
         setupFilePicker();
         setupSpinner();
         setupGenerateButton();
@@ -118,7 +121,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Bitmap generateImageFromJson(JSONArray jsonArray) throws Exception {
-        return PngGenerator.generatePng(this, jsonArray, ScriptStyles.values()[scriptStyleSpinner.getSelectedItemPosition()]);
+        return PngGenerator.generatePng(this,
+                jsonArray,
+                ScriptStyles.values()[scriptStyleSpinner.getSelectedItemPosition()],
+                addTitleCheckBox.isChecked());
     }
 
     private void showFullScreenPreview(Bitmap image) {

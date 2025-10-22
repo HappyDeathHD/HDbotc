@@ -12,35 +12,35 @@ import ru.hd.hdbotc.model.ScriptStyles;
 
 public class PngGenerator {
 
-    public static Bitmap generatePng(Context context, JSONArray script, ScriptStyles selectedStyle) {
+    public static Bitmap generatePng(Context context, JSONArray script, ScriptStyles selectedStyle, boolean addTitle) {
         switch (selectedStyle) {
             case TRANSPARENT_CLASSIC:
-                return createTransparentClassic(context, script);
+                return createTransparentClassic(context, script, addTitle);
             case  WHITE_CLASSIC:
-                return createWhiteClassic(context, script);
+                return createWhiteClassic(context, script, addTitle);
             case TRANSPARENT_AMATIC:
-                return createTransparentAmatic(context, script);
+                return createTransparentAmatic(context, script, addTitle);
             case BLACK_PRINT:
-                return applyContrastFilter(createTransparentClassic(context, script), 200);
+                return applyContrastFilter(createTransparentClassic(context, script, addTitle), 200);
             default:
-                return createTransparentClassic(context, script);
+                return createTransparentClassic(context, script, addTitle);
         }
     }
 
-    private static Bitmap createTransparentClassic(Context context, JSONArray script) {
+    private static Bitmap createTransparentClassic(Context context, JSONArray script, boolean addTitle) {
         Typeface typefaceR = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
         Typeface typefaceB = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);
-        return new TransparentTwoRow().generateImageFromJson(context, script, typefaceR, typefaceB);
+        return new TransparentTwoRow().generateImageFromJson(context, script, typefaceR, typefaceB, addTitle);
     }
 
-    private static Bitmap createTransparentAmatic(Context context, JSONArray script) {
+    private static Bitmap createTransparentAmatic(Context context, JSONArray script, boolean addTitle) {
         Typeface typefaceR = Typeface.createFromAsset(context.getAssets(), "fonts/AmaticSC-Regular.ttf");
         Typeface typefaceB = Typeface.createFromAsset(context.getAssets(), "fonts/AmaticSC-Bold.ttf");
-        return new TransparentTwoRow().generateImageFromJson(context, script, typefaceR, typefaceB);
+        return new TransparentTwoRow().generateImageFromJson(context, script, typefaceR, typefaceB, addTitle);
     }
 
-    private static Bitmap createWhiteClassic(Context context, JSONArray script) {
-        Bitmap transparentBmp = createTransparentClassic(context, script);
+    private static Bitmap createWhiteClassic(Context context, JSONArray script, boolean addTitle) {
+        Bitmap transparentBmp = createTransparentClassic(context, script, addTitle);
         if (transparentBmp == null) {
             return null;
         }
