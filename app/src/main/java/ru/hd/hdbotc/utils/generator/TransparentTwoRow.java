@@ -123,7 +123,7 @@ public class TransparentTwoRow {
                 // Заголовок блока
                 paint.setTextSize(60);
                 canvas.drawText(teamNamesRu[j].toUpperCase(), 100, currentY + 60, paint);
-                currentY += 100;
+                currentY += 70;
 
                 int rowHeight = 0; // Высота текущего ряда
                 int x = 50; // Начальная координата X для карточки
@@ -173,66 +173,69 @@ public class TransparentTwoRow {
     }
 
     private Bitmap createCharacterCard(JSONObject character, Context context, Typeface typefaceR, Typeface typefaceB) throws Exception {
-        // Размеры шрифтов
-        int nameTextSize = 40; // Размер шрифта для названия
-        int abilityTextSize = 30; // Размер шрифта для описания
+        int nameTextSize = 40;
+        int abilityTextSize = 30;
+        int lineSpacing = 8; // Отступ между строками
+        int textPadding = 15; // Отступы сверху/снизу от текста
 
-        // Создаем Paint для текста
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
 
-        // Загружаем иконку персонажа
+        // Иконка
         String iconPath = "icons/" + character.getString("id") + ".png";
         Bitmap icon = null;
         try {
             icon = BitmapFactory.decodeStream(context.getAssets().open(iconPath));
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
-        // Размеры иконки (высота как три строки текста)
-        int iconSize = 200; // Примерно высота трех строк текста
+        int iconSize = 200;
         Bitmap scaledIcon = null;
         if (icon != null) {
-            // Масштабируем иконку до нужного размера
             scaledIcon = Bitmap.createScaledBitmap(icon, iconSize, iconSize, true);
         }
 
+        // Разбиваем текст
         String ability = character.getString("ability");
         paint.setTextSize(abilityTextSize);
         paint.setTypeface(typefaceR);
         String[] abilityLines = splitTextIntoLines(ability, paint, 990);
 
-        int cardWidth = 1200;
-        int cardHeight = nameTextSize + Math.max(3, abilityLines.length) * (abilityTextSize + 20);
+        // Правильный расчет высоты: имя + все строки описания + отступы
+        String name = character.getString("name");
+        int textHeight = nameTextSize +
+                abilityLines.length * abilityTextSize +
+                (abilityLines.length - 1) * lineSpacing +
+                2 * textPadding; // отступы сверху и снизу
 
-        // карточка
+        // Итоговая высота - максимум из высоты текста и иконки
+        int cardHeight = Math.max(textHeight, iconSize);
+        int cardWidth = 1200;
+
         Bitmap card = Bitmap.createBitmap(cardWidth, cardHeight, Bitmap.Config.ARGB_8888);
         Canvas cardCanvas = new Canvas(card);
 
-        // иконка
-        if (scaledIcon != null) {
-            int iconY = (cardHeight - iconSize) / 2; // Центрируем иконку по вертикали относительно всей карточки
-            cardCanvas.drawBitmap(scaledIcon, 0, iconY, null); // Отступ слева
-        }
+        // Позиционирование текста (сверху вниз)
+        int nameX = 210;
+        int currentY = textPadding; // Отступ сверху
 
-        // название роли
-        String name = character.getString("name");
+        // Название
         paint.setTextSize(nameTextSize);
         paint.setTypeface(typefaceB);
-        int nameX = 210; // Отступ после иконки
-        int nameY = (cardHeight / 2) - (nameTextSize + 3 * abilityTextSize + 20) / 2 + nameTextSize / 2;
+        cardCanvas.drawText(name, nameX, currentY + nameTextSize, paint);
+        currentY += nameTextSize + 5; // отступ после названия
 
-        cardCanvas.drawText(name, nameX, nameY, paint);
-
-        // описание
+        // Описание
         paint.setTextSize(abilityTextSize);
         paint.setTypeface(typefaceR);
-
-        int abilityX = 210; // Отступ после иконки
-        int abilityY = nameY + nameTextSize + 5; // После названия с отступом
-
         for (int i = 0; i < abilityLines.length; i++) {
-            cardCanvas.drawText(abilityLines[i], abilityX, abilityY + i * (abilityTextSize + 10), paint); // 10px между строками
+            cardCanvas.drawText(abilityLines[i], nameX, currentY + abilityTextSize, paint);
+            currentY += abilityTextSize + lineSpacing;
+        }
+
+        // Иконка (центрируем по вертикали)
+        if (scaledIcon != null) {
+            int iconY = (cardHeight - iconSize) / 2;
+            cardCanvas.drawBitmap(scaledIcon, 0, iconY, null);
         }
 
         return card;
